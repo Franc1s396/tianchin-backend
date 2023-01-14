@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.francis.tianchin.activity.mapper.ActivityMapper">
+    <resultMap type="org.francis.tianchin.activity.model.Activity" id="activityResult">
+        <result property="activityId" column="activity_id"/>
+        <result property="activityName" column="activity_name"/>
+        <result property="channelId" column="channel_id"/>
+        <result property="info" column="info"/>
+        <result property="type" column="type"/>
+        <result property="discount" column="discount"/>
+        <result property="voucher" column="voucher"/>
+        <result property="status" column="status"/>
+        <result property="beginTime" column="begin_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="gmtCreate" column="gmt_create"/>
+        <result property="gmtModified" column="gmt_modified"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+    <resultMap id="activityDTOResult" type="org.francis.tianchin.activity.model.dto.ActivityDTO"
+               extends="activityResult">
+        <result property="channelName" column="channel_name"/>
+    </resultMap>
+
+    <sql id="selectActivity">
+        select activity_id,
+               activity_name,
+               channel_id,
+               info,
+               type,
+               discount,
+               voucher,
+               status,
+               begin_time,
+               end_time,
+               gmt_create,
+               gmt_modified,
+               del_flag,
+               create_by,
+               update_by,
+               remark
+        from tianchin_activity
+    </sql>
+
+    <sql id="selectActivityDTO">
+        SELECT ta.activity_id,
+               ta.activity_name,
+               ta.channel_id,
+               tc.channel_name,
+               ta.info,
+               ta.type,
+               ta.discount,
+               ta.voucher,
+               ta.status,
+               ta.begin_time,
+               ta.end_time,
+               ta.gmt_create,
+               ta.gmt_modified,
+               ta.del_flag,
+               ta.create_by,
+               ta.update_by,
+               ta.remark
+        FROM tianchin_activity ta
+                 INNER JOIN tianchin_channel tc ON ta.channel_id = tc.channel_id
+    </sql>
+
+    <select id="selectActivityDTOPage" resultType="org.francis.tianchin.activity.model.dto.ActivityDTO">
+        <include refid="selectActivityDTO"/>
+        <where>
+            <if test="request.activityName != null  and request.activityName != ''">
+                and ta.activity_name like concat('%', #{request.activityName}, '%')
+            </if>
+            <if test="request.channelId != null ">and ta.channel_id = #{request.channelId}</if>
+            <if test="request.type != null ">and ta.type = #{request.type}</if>
+            <if test="request.status != null ">and ta.status = #{request.status}</if>
+            AND ta.del_flag=0
+        </where>
+    </select>
+    <select id="selectActivityById" resultType="org.francis.tianchin.activity.model.dto.ActivityDTO">
+        <include refid="selectActivityDTO"/>
+        WHERE ta.activity_id=#{activityId} AND ta.del_flag=0
+    </select>
+    <select id="selectActivityList" resultType="org.francis.tianchin.activity.model.dto.ActivityDTO">
+        <include refid="selectActivityDTO"/>
+        <where>
+            <if test="request.activityName != null  and request.activityName != ''">
+                and ta.activity_name like concat('%', #{request.activityName}, '%')
+            </if>
+            <if test="request.channelId != null ">and ta.channel_id = #{request.channelId}</if>
+            <if test="request.type != null ">and ta.type = #{request.type}</if>
+            <if test="request.status != null ">and ta.status = #{request.status}</if>
+            AND ta.del_flag=0
+        </where>
+    </select>
+</mapper>
